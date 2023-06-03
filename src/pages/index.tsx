@@ -3,7 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 
-import { api } from "~/utils/api";
+import { RouterOutputs, api } from "~/utils/api";
 
 const CreatePostWizard = () => {
 
@@ -17,6 +17,11 @@ const CreatePostWizard = () => {
     <img className="w-14 h-14 rounded-full" src={user.profileImageUrl} alt="Profile image" />
     <input placeholder="Tweet here!" className="bg-transparent grow outline-none" />
   </div>
+}
+
+type PostWithUser = RouterOutputs["posts"]["getAll"][number]
+const PostView = (props: {post: PostWithUser}) => {
+  <div className="p-8 border-b border-slate-400" key={post.id}>{post.content}</div>
 }
 
 const Home: NextPage = () => {
@@ -39,17 +44,17 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex justify-center h-screen">
-      <div className="h-full w-full border-x border-slate-400 md:max-w-2xl ">
-        <div className="border-b border-slate-400 p-4">
+        <div className="h-full w-full border-x border-slate-400 md:max-w-2xl ">
+          <div className="border-b border-slate-400 p-4">
             {!user.isSignedIn && <div className="flex justify-center"><SignInButton /></div>}
             {user.isSignedIn && <CreatePostWizard />}
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col">
-        {[...data]?.map((post) => (
-         <div className="p-8 border-b border-slate-400" key={post.id}>{post.content}</div>
-        ))}
-      </div>
+        <div className="flex flex-col">
+          {[...data]?.map(({ post, author }) => (
+            <div className="p-8 border-b border-slate-400" key={post.id}>{post.content}</div>
+          ))}
+        </div>
         <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
       </main>
     </>
